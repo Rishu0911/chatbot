@@ -1,11 +1,23 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from fastapi import FastAPI,Body
+from starlette.middleware.cors import CORSMiddleware
 
-model_name = "gpt2"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name)
+# Initialize the FastAPI application
+app = FastAPI()
 
-def generate_response(prompt):
-    inputs = tokenizer.encode(prompt, return_tensors="pt")
-    outputs = model.generate(inputs, max_length=100, num_return_sequences=1, no_repeat_ngram_size=2)
-    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return response
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Frontend origin
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Define a simple route
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to your FastAPI application!"}
+
+# Another example endpoint
+@app.post("/process")
+async def submit_text(text: str = Body(..., embed=True)):
+    return {"received_text": f"Hey user has placed text {text}"}
