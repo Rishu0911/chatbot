@@ -1,39 +1,52 @@
-
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
-from langchain.document_loaders import TextLoader
+import requests
+from langchain_core.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
-import os
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
 
-from langchain_community.llms.llamacpp import LlamaCpp
+# Step 1: Setup Local LLM (Ollama Phi)
+def query_local_ollama(prompt):
+    # Adjust this URL to match your local Ollama server setup
+    print(prompt)
+    url = "http://localhost:11434/api/generate"
+    headers = {"Content-Type": "application/json"}
+    payload = { 'model': 'phi',
+        'prompt': prompt,
+        'stream': False}
+    response = requests.post(url, json=payload, headers=headers)
+    print(response)
+    return response.json().get("response", "")
 
-# Load a pretrained Open Source LLM (Llama3, Mistral, Falcon)
-llm = LlamaCpp(model_path="path/to/llama3-or-mistral.ggml", n_ctx=4096)
+# Step 2: Connect LLM with FAISS and Create Chain
+CUSTOM_PROMPT_TEMPLATE = """
+Use the pieces of information provided in the context to answer user's question.
+If you don't know the answer, just say that you don't know, don't try to make up an answer.
+Don't provide anything out of the given context.
 
-# Download & preprocess medical data (example: PubMed abstracts)
-medical_data_path = "medical_data.txt"
-if not os.path.exists(medical_data_path):
-    os.system("wget -O medical_data.txt https://raw.githubusercontent.com/openmedlab/Awesome-Medical-Dataset/main/pubmed.txt")
+Context: {context}
+Question: {question}
 
-# Load medical text files into memory
-loader = TextLoader("medical_data.txt")
-docs = loader.load()
+Start the answer directly. No small talk, please.
+"""
 
-# Convert text to embeddings (vector representations)
-embedding_function = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+def set_custom_prompt(custom_prompt_template):
+    prompt = PromptTemplate(template=custom_prompt_template, input_variables=["context", "question"])
+    return prompt
 
-# Store embeddings in FAISS for efficient retrieval
-vectorstore = FAISS.from_documents(docs, embedding_function)
+# Load Database
+DB_FAISS_PATH = "vectorstore/db_faiss"
+embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+db = FAISS.load_local(DB_FAISS_PATH, embedding_model, allow_dangerous_deserialization=True)
 
-# Create a RAG-based chatbot using RetrievalQA
-rag_chain = RetrievalQA(llm=llm, retriever=vectorstore.as_retriever())
+# Create QA chain
+def query_qa_chain(context, question):
+    prompt = set_custom_prompt(CUSTOM_PROMPT_TEMPLATE).format(context=context, question=question)
+    return query_local_ollama(prompt)
 
-# Start chatbot loop
-print("Healthcare Chatbot (Type 'exit' to quit)")
-while True:
-    user_input = input("You: ")
-    if user_input.lower() == "exit":
-        print("Goodbye!")
-        break
-    response = rag_chain.run(user_input)
-    print("Chatbot:", response)
+def process_query(user_query):
+    context = db.as_retriever(search_kwargs={'k': 3}).get_relevant_documents(user_query)
+    context_text = "\n".join([doc.page_content for doc in context])
+    response = query_qa_chain(context_text, user_query)
+    return response
+
+

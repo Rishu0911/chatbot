@@ -1,6 +1,8 @@
 from fastapi import FastAPI,Body
 from starlette.middleware.cors import CORSMiddleware
 
+from core import process_query
+
 # Initialize the FastAPI application
 app = FastAPI()
 
@@ -20,4 +22,5 @@ def read_root():
 # Another example endpoint
 @app.post("/process")
 async def submit_text(text: str = Body(..., embed=True)):
-    return {"received_text": f"Hey user has placed text {text}"}
+    response = process_query(text)
+    return {"received_text": response}
