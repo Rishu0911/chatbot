@@ -1,9 +1,12 @@
-from fastapi import FastAPI,Body
+from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from core import process_query
+from database.database import Base, engine
+from router import auth, agent
 
-# Initialize the FastAPI application
+Base.metadata.create_all(bind=engine)
+
+# FastAPI app
 app = FastAPI()
 
 app.add_middleware(
@@ -14,13 +17,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define a simple route
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to your FastAPI application!"}
-
-# Another example endpoint
-@app.post("/process")
-async def submit_text(text: str = Body(..., embed=True)):
-    response = process_query(text)
-    return {"received_text": response}
+app.include_router(auth.router)
+app.include_router(agent.router)
