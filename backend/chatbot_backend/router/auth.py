@@ -1,6 +1,6 @@
-from http.client import HTTPException
 
-from fastapi import APIRouter, Depends
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -17,11 +17,14 @@ router = APIRouter(
 
 @router.post("/create")
 async def create_user(user: UserItem, db: Session = Depends(get_db)):
+    user_model = db.query(User).filter(User.username == user.username).first()
+    if user_model is not None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User Already exist")
     hashed_password = hash_password(user.password)
+
     user_model = User(
         username= user.username,
-        password= hashed_password,
-        chat= ""
+        password= hashed_password
     )
     db.add(user_model)
     db.commit()
@@ -30,8 +33,12 @@ async def create_user(user: UserItem, db: Session = Depends(get_db)):
 @router.post("/authenticate")
 async def authenticate_user(user: UserItem, db: Session = Depends(get_db)):
     user_model = db.query(User).filter(User.username == user.username).first()
+    if user_model is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Username")
+
     if not verify_password(user.password, user_model.password):
         raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail="Invalid Password")
+
     token = create_jwt_token({"username" : user.username})
     return {"token" : token}
 

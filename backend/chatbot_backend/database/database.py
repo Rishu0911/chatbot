@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Database URL (adjust this according to your PostgreSQL setup)
-DATABASE_URL = "mysql+pymysql://root:123456@localhost/chatbot"
+DATABASE_URL = "mysql+pymysql://root:123456@localhost:3309/chatbot"
 
 # SQLAlchemy setup
 Base = declarative_base()

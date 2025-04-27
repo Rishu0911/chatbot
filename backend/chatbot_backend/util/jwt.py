@@ -1,10 +1,12 @@
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 
-import jwt
+from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from fastapi.security import OAuth2PasswordBearer
+from starlette import status
+
 SECRET_KEY = "RISHU091199"  # Change this to something more secure
 ALGORITHM = "HS256"
 OAuth2_bearer = OAuth2PasswordBearer(tokenUrl='/auth/authenticate')
@@ -28,8 +30,9 @@ def decode_jwt_token(token: Annotated[str, Depends(OAuth2_bearer)]) -> dict:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
-        raise Exception("Token has expired")
+        raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail="Token Has Expired")
+
     except jwt.InvalidTokenError:
-        raise Exception("Invalid token")
+        raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail="Invalid Token")
 
 
