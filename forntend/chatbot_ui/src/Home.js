@@ -3,6 +3,9 @@ import httpHandler from "./http/HttpHandler";
 import ChatWindow from "./ChatWindow/ChatWindow"
 import InputArea from "./InputArea/InputArea"
 import { useNavigate } from "react-router-dom";
+import './Home.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 
   function Home() {
@@ -36,7 +39,7 @@ import { useNavigate } from "react-router-dom";
     alert("You have been logged out!");
   
     // Redirect to the login page
-    navigate("/login")
+    navigate("/auth")
   };
    
   const getChats = async () => {
@@ -57,11 +60,17 @@ import { useNavigate } from "react-router-dom";
   
 
     return (
-      <div className="container mt-4">
-        <h1 className="text-center">Bot</h1>
+      <div className="chat-wrapper">
+        {/* <h1 className="text-center">Bot</h1>
         <div className="text-end">
       <button className="btn btn-danger" onClick={handleLogout}>
         Logout
+      </button> */}
+    {/* </div> */}
+    <div className="top-bar">
+      <div className="title">Serapi</div>
+      <button className="logout-button" onClick={handleLogout} title="Logout">
+        <FontAwesomeIcon icon={faRightFromBracket} />
       </button>
     </div>
         <ChatWindow chatHistory={chatHistory} />

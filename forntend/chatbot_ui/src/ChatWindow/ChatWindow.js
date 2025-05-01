@@ -1,14 +1,18 @@
 import React from "react";
+import'./chat_window.css'
 
 function ChatWindow({ chatHistory }) {
   return (
-    <div className="chat-window border rounded p-3 mb-3">
-      {chatHistory.map((chat, index) => (
-        <div key={index} className="chat-message">
-          <strong>{chat.sender}:</strong> {chat.message}
-        </div>
-      ))}
-    </div>
+    <div className="chat-window">
+    {chatHistory.map((chat, index) => (
+      <div
+        key={index}
+        className={`chat-message ${chat.sender === 'User' ? 'user-message' : 'bot-message'}`}
+      >
+        {chat.message}
+      </div>
+    ))}
+  </div>
   );
 }
 

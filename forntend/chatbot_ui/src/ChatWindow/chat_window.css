@@ -1,0 +1,34 @@
+.chat-window {
+    width: 100%;             /* Set the width as needed */
+    height: 90vh;            /* Fixed height */
+    overflow-y: auto;         /* Enables vertical scroll */
+    border: 1px solid #ccc;   /* Optional: border styling */
+    padding: 10vh;            /* Optional: inner spacing */   /* Optional: background color */
+  }
+  
+  /* General message styling */
+  .chat-message {
+    max-width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 16px;
+    line-height: 1.4;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    word-wrap: break-word;
+  }
+  
+  /* User message styling */
+  .user-message {
+    background-color: #dfdede; /* Light green for user messages */
+    border: 1px solid #e4e4e4;
+    color: #333;
+    text-align: left;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+  
+  
+  
