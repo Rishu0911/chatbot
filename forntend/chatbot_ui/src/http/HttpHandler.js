@@ -4,7 +4,9 @@ import axios from "axios";
 // Create a reusable HTTP client
 const httpHandler = axios.create({
     baseURL: "http://127.0.0.1:8000", // Replace with your API base URL
-    timeout: 5000, // Set a timeout for requests
+    headers: {
+        "Content-Type": "application/json"
+      } 
 });
 
 // Add a request interceptor to include the Bearer token

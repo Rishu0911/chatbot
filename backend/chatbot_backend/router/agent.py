@@ -1,3 +1,5 @@
+from time import sleep
+
 from fastapi import FastAPI, Body, APIRouter, Depends
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
@@ -26,8 +28,9 @@ def get_user_chat(user: dict =  Depends(decode_jwt_token), db: Session = Depends
 # Another example endpoint
 @router.post("/process")
 async def submit_text(text: str = Body(..., embed=True), user: dict =  Depends(decode_jwt_token), db: Session = Depends(get_db)):
-    # response = process_query(text)
-    response = text
+    response = process_query(text)
+    # response = text
+    response = response[:500]
     chat_entry = UserChat(
         query=text,
         response=response,
@@ -36,4 +39,11 @@ async def submit_text(text: str = Body(..., embed=True), user: dict =  Depends(d
     db.add(chat_entry)
     db.commit()
     return {"received_text": response}
+
+@router.delete("/chats")
+def clear_user_chat(user: dict =  Depends(decode_jwt_token), db: Session = Depends(get_db)):
+    db.query(UserChat).filter(UserChat.username == user.get('username')).delete()
+
+    db.commit()
+    return {"response": "Chats Cleared"}
 
