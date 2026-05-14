@@ -15,11 +15,6 @@ router = APIRouter(
     tags= ["agent"]
 )
 
-# Define a simple route
-@router.get("/")
-def read_root(user: dict =  Depends(decode_jwt_token)):
-    return {"message": "Welcome to your FastAPI application!"}
-
 @router.get("/chats")
 def get_user_chat(user: dict =  Depends(decode_jwt_token), db: Session = Depends(get_db)):
     chats = db.query(UserChat).filter(UserChat.username == user.get('username')).all()

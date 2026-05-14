@@ -1,28 +1,4 @@
-/* .input_container {
-    position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 300px;
-  background-color: #fff;
-  padding: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  border-radius: 12px;
-  z-index: 9999;
-  }
-  
-  #chatInput {
-    width: 100%;
-    min-height: 40px;
-    max-height: 150px;
-    padding: 10px;
-    font-size: 16px;
-    resize: none;
-    overflow-y: auto;
-    box-sizing: border-box;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    transition: all 0.2s ease-in-out;
-  } */
+
   .input_container {
     position: fixed;
     bottom: 0;

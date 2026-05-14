@@ -6,7 +6,11 @@ from sqlalchemy.orm import sessionmaker
 
 # Database URL (adjust this according to your PostgreSQL setup)
 DB_PASSWORD = urllib. parse.quote_plus('123456')
-DATABASE_URL = f"mysql+pymysql://root:{DB_PASSWORD}@localhost:3309/chatbot"
+DB_USER     = "root"
+DB_HOST     = "localhost"
+DB_PORT     = "3309"
+DB_NAME     = "chatbot"
+DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/chatbot"
 
 # SQLAlchemy setup
 Base = declarative_base()

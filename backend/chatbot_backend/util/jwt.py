@@ -12,16 +12,12 @@ ALGORITHM = "HS256"
 OAuth2_bearer = OAuth2PasswordBearer(tokenUrl='/auth/authenticate')
 
 
-
-
 def create_jwt_token(data: dict) -> str:
     """Generate a JWT token with an expiration time."""
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(minutes=60)  # Token expires in 60 minutes
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-
 
 
 def decode_jwt_token(token: Annotated[str, Depends(OAuth2_bearer)]) -> dict:
